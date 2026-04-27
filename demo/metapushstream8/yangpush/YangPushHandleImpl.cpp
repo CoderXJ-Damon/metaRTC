@@ -138,18 +138,30 @@ int YangPushHandleImpl::publish(char* url,yangbool isWhip) {
 
 	  if(m_hasAudio) {
 	        m_hasAudio=bool(m_cap->startAudioCapture()==Yang_Ok);
+	        yang_trace("\n[DEBUG] startAudioCapture() returned: %d\n", m_hasAudio);
 	    }
 	if (m_hasAudio) {
-
+			yang_trace("\n[DEBUG] Before initAudioEncoding()\n");
 			m_cap->initAudioEncoding();
+			yang_trace("\n[DEBUG] After initAudioEncoding()\n");
 		}
 
+		yang_trace("\n[DEBUG] Before initVideoEncoding()\n");
 		m_cap->initVideoEncoding();
-		m_cap->setRtcNetBuffer(m_rtcPub);
+		yang_trace("\n[DEBUG] After initVideoEncoding()\n");
 
-		if (m_hasAudio)
+		yang_trace("\n[DEBUG] Before setRtcNetBuffer()\n");
+		m_cap->setRtcNetBuffer(m_rtcPub);
+		yang_trace("\n[DEBUG] After setRtcNetBuffer()\n");
+
+		if (m_hasAudio) {
+			yang_trace("\n[DEBUG] Before startAudioEncoding()\n");
 			m_cap->startAudioEncoding();
+			yang_trace("\n[DEBUG] After startAudioEncoding()\n");
+		}
+		yang_trace("\n[DEBUG] Before startVideoEncoding()\n");
 		m_cap->startVideoEncoding();
+		yang_trace("\n[DEBUG] After startVideoEncoding()\n");
 
         if(isWhip){
              err = m_rtcPub->init(url,yangtrue);

@@ -41,6 +41,7 @@ int32_t YangOpenH264Encoder::init(YangVideoInfo* videoInfo,YangVideoEncInfo* enc
 	if (m_isInit == 1)
 		return Yang_Ok;
 
+	yang_trace("\nYangOpenH264Encoder init");
 	setVideoPara(videoInfo, encInfo);
 	int32_t width=videoInfo->outWidth;
 	int32_t height=videoInfo->outHeight;

@@ -186,9 +186,20 @@ void RecordMainWindow::init() {
     m_context->avinfo.audio.audioCacheSize=8;
     m_context->avinfo.audio.audioPlayCacheNum=8;
 
-    m_context->avinfo.video.videoCacheNum=10;
-    m_context->avinfo.video.evideoCacheNum=10;
-    m_context->avinfo.video.videoPlayCacheNum=10;
+    // 增加视频缓冲区大小以防止堆栈溢出
+    yang_trace("\n[DEBUG] Setting video buffer sizes - BEFORE: videoCacheNum=%d, evideoCacheNum=%d, videoPlayCacheNum=%d\n",
+        m_context->avinfo.video.videoCacheNum,
+        m_context->avinfo.video.evideoCacheNum,
+        m_context->avinfo.video.videoPlayCacheNum);
+
+    m_context->avinfo.video.videoCacheNum=150;
+    m_context->avinfo.video.evideoCacheNum=150;
+    m_context->avinfo.video.videoPlayCacheNum=30;
+
+    yang_trace("\n[DEBUG] Setting video buffer sizes - AFTER: videoCacheNum=%d, evideoCacheNum=%d, videoPlayCacheNum=%d\n",
+        m_context->avinfo.video.videoCacheNum,
+        m_context->avinfo.video.evideoCacheNum,
+        m_context->avinfo.video.videoPlayCacheNum);
 
     m_context->avinfo.audio.audioEncoderType=Yang_AED_OPUS;
     m_context->avinfo.rtc.rtcLocalPort=17000;

@@ -54,15 +54,26 @@ void YangPushEncoder::initAudioEncoder() {
 
 }
 void YangPushEncoder::initVideoEncoder() {
-	if (m_out_videoBuffer == NULL)
+	yang_trace("\n[DEBUG] YangPushEncoder::initVideoEncoder() START\n");
+
+	if (m_out_videoBuffer == NULL) {
+		yang_trace("\n[DEBUG] Creating YangVideoEncoderBuffer with cache num: %d\n",
+			m_context->avinfo.video.evideoCacheNum);
 		m_out_videoBuffer = new YangVideoEncoderBuffer(m_context->avinfo.video.evideoCacheNum);
+		yang_trace("\n[DEBUG] YangVideoEncoderBuffer created successfully\n");
+	}
 
 	if (m_ve == NULL) {
-		//	YangEncoderFactory yf;
+		yang_trace("\n[DEBUG] Creating YangVideoEncoderHandle\n");
 		m_ve = new YangVideoEncoderHandle(m_context,m_videoInfo);
+		yang_trace("\n[DEBUG] YangVideoEncoderHandle created, calling setOutVideoBuffer\n");
 		m_ve->setOutVideoBuffer(m_out_videoBuffer);
+		yang_trace("\n[DEBUG] Calling YangVideoEncoderHandle::init()\n");
 		m_ve->init();
+		yang_trace("\n[DEBUG] YangVideoEncoderHandle::init() completed successfully\n");
 	}
+
+	yang_trace("\n[DEBUG] YangPushEncoder::initVideoEncoder() END\n");
 }
 void YangPushEncoder::sendMsgToEncoder(YangRequestType req){
 	if(m_ve) m_ve->sendMsgToEncoder(req);
@@ -74,10 +85,14 @@ void YangPushEncoder::startAudioEncoder() {
 	}
 }
 void YangPushEncoder::startVideoEncoder() {
+	yang_trace("\n[DEBUG] YangPushEncoder::startVideoEncoder() START, m_ve=%p, m_isStart=%d\n", m_ve, m_ve ? m_ve->m_isStart : -1);
 	if (m_ve && !m_ve->m_isStart) {
+		yang_trace("\n[DEBUG] Calling m_ve->start()\n");
 		m_ve->start();
+		yang_trace("\n[DEBUG] m_ve->start() completed, sleeping 2000us\n");
 		yang_usleep(2000);
 	}
+	yang_trace("\n[DEBUG] YangPushEncoder::startVideoEncoder() END\n");
 }
 void YangPushEncoder::setInAudioBuffer(YangAudioBuffer *pbuf) {
 	if (m_ae != NULL)

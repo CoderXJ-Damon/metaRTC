@@ -76,6 +76,7 @@ void YangVideoEncoderHandle::onAudioData(YangFrame* pframe){
 }
 
 void YangVideoEncoderHandle::startLoop() {
+    yang_trace("\n[ENCODER_THREAD] startLoop() called\n");
     m_isConvert = yangtrue;
 	YangVideoInfo para;
 	YangYuvConvert yuv;
@@ -88,6 +89,9 @@ void YangVideoEncoderHandle::startLoop() {
 	int32_t m_in_fileSize = bitLen * para.width * para.height * 3 / 2;
 	int32_t m_out_fileSize = bitLen * para.outWidth * para.outHeight * 3 / 2;
 
+	yang_trace("\n[ENCODER_THREAD] Video params: width=%d, height=%d, outWidth=%d, outHeight=%d, isHw=%d, rate=%d, frame=%d\n",
+		para.width, para.height, para.outWidth, para.outHeight, isHw, para.rate, para.frame);
+
 	uint8_t *outVideoSrc = NULL;
 	if (isTrans) {
 		outVideoSrc = new uint8_t[para.outWidth * para.outHeight * 3 / 2];
@@ -98,10 +102,13 @@ void YangVideoEncoderHandle::startLoop() {
 	if (m_out_videoBuffer != NULL)
 		m_out_videoBuffer->resetIndex();
 
+	yang_trace("\n[ENCODER_THREAD] Creating video encoder...\n");
 	YangEncoderFactory ydf;
 	YangVideoEncoder *t_Encoder = ydf.createVideoEncoder(m_videoInfo);
+	yang_trace("\n[ENCODER_THREAD] Encoder created, initializing...\n");
 
 	t_Encoder->init(m_videoInfo,&m_context->avinfo.enc);
+	yang_trace("\n[ENCODER_THREAD] Encoder initialized successfully, starting encoding loop\n");
 
 	uint8_t* nv12Src=NULL;
 
@@ -113,10 +120,12 @@ void YangVideoEncoderHandle::startLoop() {
 	memset(&videoFrame,0,sizeof(YangFrame));
 
     while (m_isConvert) {
+		yang_trace("\n[ENCODER_THREAD] Encoding loop iteration, buffer size=%d\n", m_in_videoBuffer->size());
 		if (m_in_videoBuffer->size() == 0) {
 			yang_usleep(20000);
 			continue;
 		}
+		yang_trace("\n[ENCODER_THREAD] Getting video frame from buffer\n");
 		uint8_t *tmp=NULL;
 		uint8_t *tmpsrc=NULL;
 
@@ -166,6 +175,7 @@ void YangVideoEncoderHandle::startLoop() {
 
 		videoFrame.uid=m_uid;
 
+		yang_trace("\n[ENCODER_THREAD] Before encode, isTrans=%d\n", isTrans);
 		if (isTrans) {
 			yuv.scaleI420(tmp,
 					outVideoSrc, para.width, para.height, para.outWidth,
@@ -177,16 +187,20 @@ void YangVideoEncoderHandle::startLoop() {
 		} else {
 			videoFrame.payload=tmp;
 			videoFrame.nb=m_in_fileSize;
+			yang_trace("\n[ENCODER_THREAD] Calling encoder.encode() with size=%d\n", m_in_fileSize);
 			t_Encoder->encode(&videoFrame,this);
+			yang_trace("\n[ENCODER_THREAD] encoder.encode() completed\n");
 
 		}
 		tmp=NULL;
 
 	}
 
+	yang_trace("\n[ENCODER_THREAD] Encoding loop ended, cleaning up\n");
 	yang_deleteA(outVideoSrc);
 	yang_deleteA(nv12Src);
 	yang_delete(t_Encoder);
+	yang_trace("\n[ENCODER_THREAD] startLoop() finished\n");
 
 
 }

@@ -130,45 +130,73 @@ void YangH264EncoderSoft::initX264Param(YangVideoInfo *pvp,
 
 }
 int32_t YangH264EncoderSoft::init(YangVideoInfo* videoInfo,YangVideoEncInfo* encInfo) {
-	if (m_isInit == 1)
+	yang_trace("\n[H264_ENCODER] init() START\n");
+	if (m_isInit == 1) {
+		yang_trace("\n[H264_ENCODER] Already initialized, returning\n");
 		return Yang_Ok;
+	}
 #if Yang_X264_So
+	yang_trace("\n[H264_ENCODER] Loading libx264.so\n");
 	m_lib.loadObject("libx264");
 	loadLib();
+	yang_trace("\n[H264_ENCODER] libx264.so loaded\n");
 #endif
 
+	yang_trace("\n[H264_ENCODER] Calling setVideoPara()\n");
 	setVideoPara(videoInfo, encInfo);
+
+	yang_trace("\n[H264_ENCODER] Creating x264_param_t\n");
 	x264_param_t *param = new x264_param_t();
+
+	yang_trace("\n[H264_ENCODER] preset=%d, calling x264_param_default_preset or x264_param_default\n", encInfo->preset);
 	if (encInfo->preset < 5)
 		yang_x264_param_default_preset(param, x264_preset_names[encInfo->preset],
 				"zerolatency");
 	else
 		yang_x264_param_default(param);
 
+	yang_trace("\n[H264_ENCODER] Calling yang_x264_param_apply_profile\n");
 	yang_x264_param_apply_profile(param, x264_profile_names[0]);
+
+	yang_trace("\n[H264_ENCODER] Calling initX264Param()\n");
 	initX264Param(videoInfo, encInfo, param);
 
 	param->b_repeat_headers = 1;
 
+	yang_trace("\n[H264_ENCODER] Creating x264_picture_t\n");
 	m_264Pic = new x264_picture_t();
 	memset(m_264Pic, 0, sizeof(x264_picture_t));
 	//set default param
 	param->b_sliced_threads = 0;
 
+	yang_trace("\n[H264_ENCODER] Before yang_x264_encoder_open - param: width=%d, height=%d, fps=%d\n",
+		param->i_width, param->i_height, param->i_fps_num);
+
 	if ((m_264Handle = yang_x264_encoder_open(param)) == NULL) {
-		yang_error("RE init x264_encoder_open failed\n");
+		yang_error("\n[H264_ENCODER] CRITICAL: yang_x264_encoder_open FAILED!\n");
 		exit(1);
 	}
+
+	yang_trace("\n[H264_ENCODER] yang_x264_encoder_open SUCCESS\n");
+
 	int32_t x264Format =
 			videoInfo->bitDepth == 8 ? X264_CSP_I420 : X264_CSP_HIGH_DEPTH;
 
+	yang_trace("\n[H264_ENCODER] Calling yang_x264_picture_alloc with format=%d, width=%d, height=%d\n",
+		x264Format, param->i_width, param->i_height);
+
 	yang_x264_picture_alloc(m_264Pic, x264Format, param->i_width,
 			param->i_height);
+
+	yang_trace("\n[H264_ENCODER] yang_x264_picture_alloc SUCCESS\n");
+
 	m_264Pic->i_type = X264_TYPE_AUTO;
 
 	m_isInit = 1;
 	delete param;
 	param = NULL;
+
+	yang_trace("\n[H264_ENCODER] init() SUCCESS\n");
 	return Yang_Ok;
 
 }
