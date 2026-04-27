@@ -10,6 +10,7 @@ demo/metapushstream8/metapushstream8.pro.user.*
 
 */build/*
 
+*build-metaplayer8-Desktop-Debug*
 thirdparty/lib/
 thirdparty/libsrtp-2.4.2/
 thirdparty/libyuv-master/
