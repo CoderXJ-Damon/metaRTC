@@ -77,7 +77,7 @@ win32{
     LIBS += -lmetartc8 -lyangwhip8  -lmetartccore8 -lyangutil8 -lyuv -lopenh264 -lspeexdsp -lopus -lusrsctp -lksuser -lwinmm  -lole32 -lStrmiids
     #gpu encode and decode
     #LIBS +=  -lyangwincodec8  -ld3d11 -ld3d9 -ldxva2 -ldxgi
- 
+
 
     YANG_LIB=  -L$$HOME_BASE/thirdparty/lib/win -lsrtp2  -lssl  -lcrypto
     msvc{
