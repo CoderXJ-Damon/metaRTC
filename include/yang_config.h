@@ -8,7 +8,7 @@
 #include "yang_config_os.h"
 
 #define Yang_Enable_Datachannel 1
-#define Yang_Enable_Openh264    0
+#define Yang_Enable_Openh264    1
 #define Yang_Enable_Json        1
 
 #if Yang_OS_WIN
