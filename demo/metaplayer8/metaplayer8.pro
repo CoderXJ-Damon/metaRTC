@@ -53,7 +53,17 @@ unix:!macx{
     }
  LIBS +=  -L$$HOME_BASE/thirdparty/lib
 
- LIBS += -lmetartc8 -lyangwhip8 -lmetartccore8 -lyangutil8 -lyuv -lspeexdsp -lavutil -lavcodec -lopus -lusrsctp -lpthread  -ldl
+ LIBS += -lmetartc8 -lyangwhip8 -lmetartccore8 -lyangutil8 -lyuv -lspeexdsp -lopus -lusrsctp -lpthread
+LIBS += -lavcodec   # 编解码核心库
+LIBS += -lx264       # H.264 编码库（必须在 avcodec 之后）
+LIBS += -lavformat  # 格式处理库
+LIBS += -lavutil    # 工具函数库
+LIBS += -lswscale   # 图像缩放库
+LIBS += -lswresample # 音频重采样库（如果需要）
+LIBS += -lz         # zlib 压缩
+LIBS += -lpthread   # 线程支持
+LIBS += -lm         # 数学库
+LIBS += -ldl        # 动态链接库
 
 #linux
 LIBS += -lasound
