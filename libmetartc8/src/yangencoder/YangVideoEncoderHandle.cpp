@@ -120,12 +120,10 @@ void YangVideoEncoderHandle::startLoop() {
 	memset(&videoFrame,0,sizeof(YangFrame));
 
     while (m_isConvert) {
-		yang_trace("\n[ENCODER_THREAD] Encoding loop iteration, buffer size=%d\n", m_in_videoBuffer->size());
 		if (m_in_videoBuffer->size() == 0) {
 			yang_usleep(20000);
 			continue;
 		}
-		yang_trace("\n[ENCODER_THREAD] Getting video frame from buffer\n");
 		uint8_t *tmp=NULL;
 		uint8_t *tmpsrc=NULL;
 
@@ -175,7 +173,6 @@ void YangVideoEncoderHandle::startLoop() {
 
 		videoFrame.uid=m_uid;
 
-		yang_trace("\n[ENCODER_THREAD] Before encode, isTrans=%d\n", isTrans);
 		if (isTrans) {
 			yuv.scaleI420(tmp,
 					outVideoSrc, para.width, para.height, para.outWidth,
@@ -187,9 +184,7 @@ void YangVideoEncoderHandle::startLoop() {
 		} else {
 			videoFrame.payload=tmp;
 			videoFrame.nb=m_in_fileSize;
-			yang_trace("\n[ENCODER_THREAD] Calling encoder.encode() with size=%d\n", m_in_fileSize);
 			t_Encoder->encode(&videoFrame,this);
-			yang_trace("\n[ENCODER_THREAD] encoder.encode() completed\n");
 
 		}
 		tmp=NULL;
